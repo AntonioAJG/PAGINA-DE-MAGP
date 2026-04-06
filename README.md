@@ -1,2 +1,1972 @@
-# PAGINA-DE-MAGP
-Pagina web para la clase de materiales
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bondarium Studio | Atlas Interactivo de Enlaces Químicos</title>
+  <style>
+    :root {
+      --bg: #050714;
+      --bg-2: #0b1022;
+      --panel: rgba(13, 18, 40, 0.78);
+      --panel-2: rgba(18, 28, 58, 0.85);
+      --line: rgba(148, 163, 184, 0.16);
+      --text: #e7eefc;
+      --muted: #9fb1d0;
+      --indigo: #6d7cff;
+      --cyan: #22d3ee;
+      --amber: #f8b84e;
+      --pink: #ff6ad5;
+      --green: #2ed573;
+      --red: #ff6b6b;
+      --blue: #4fa3ff;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+      --radius: 24px;
+      --ionic: linear-gradient(135deg, #ff7b7b 0%, #f97316 100%);
+      --polar: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+      --covalent: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+      --metallic: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      --glass: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(109, 124, 255, 0.16), transparent 25%),
+        radial-gradient(circle at 85% 10%, rgba(34, 211, 238, 0.12), transparent 28%),
+        radial-gradient(circle at 50% 80%, rgba(248, 184, 78, 0.08), transparent 28%),
+        linear-gradient(180deg, #050714 0%, #070b19 32%, #090f1f 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body[data-density="compact"] .long-copy,
+    body[data-density="compact"] .extra-panel,
+    body[data-density="compact"] .fact-grid,
+    body[data-density="compact"] #curiosidades { display: none !important; }
+
+    body.hide-facts [data-topic="facts"],
+    body.hide-history [data-topic="history"],
+    body.hide-safety [data-topic="safety"],
+    body.hide-uses [data-topic="uses"] { display: none !important; }
+
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--indigo), var(--cyan));
+      border-radius: 999px;
+      border: 3px solid #050714;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+
+    .shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      opacity: 0.045;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.9) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.9) 1px, transparent 1px);
+      background-size: 5px 5px;
+      mix-blend-mode: soft-light;
+      z-index: 0;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(16px);
+      background: rgba(4, 8, 20, 0.72);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(109,124,255,0.28), rgba(34,211,238,0.22));
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: inset 0 0 24px rgba(255,255,255,0.05), 0 0 28px rgba(109,124,255,0.25);
+      overflow: hidden;
+    }
+
+    .logo::before,
+    .logo::after,
+    .ring {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 2px solid rgba(34, 211, 238, 0.6);
+      border-radius: 50%;
+      animation: spin 7s linear infinite;
+    }
+    .logo::after { transform: rotate(60deg); border-color: rgba(248,184,78,0.62); animation-direction: reverse; }
+    .ring { transform: rotate(-55deg); border-color: rgba(255,106,213,0.55); animation-duration: 8.5s; }
+    .nucleus {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff8d8 0%, #f8b84e 45%, #ff6b6b 100%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      box-shadow: 0 0 18px rgba(248, 184, 78, 0.8);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes floatY { 50% { transform: translateY(-10px); } }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 12px rgba(109,124,255,0); } }
+    @keyframes dash { to { stroke-dashoffset: -140; } }
+    @keyframes bob { 50% { transform: translateY(-5px); } }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill-link, .ghost-btn, .solid-btn, .chip, .mini-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 16px;
+      transition: 0.25s ease;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .pill-link:hover, .ghost-btn:hover, .mini-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.35);
+      background: rgba(34, 211, 238, 0.08);
+    }
+
+    .solid-btn {
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      color: white;
+      border: none;
+      box-shadow: 0 12px 30px rgba(109, 124, 255, 0.35);
+      font-weight: 700;
+    }
+    .solid-btn:hover { transform: translateY(-3px) scale(1.01); }
+
+    .hero {
+      position: relative;
+      min-height: 88vh;
+      display: grid;
+      place-items: center;
+      padding: 72px 0 40px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    #heroCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.9;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .hero-copy {
+      padding: 26px 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(109, 124, 255, 0.14);
+      color: #c5d2ff;
+      border: 1px solid rgba(109, 124, 255, 0.22);
+      font-size: 0.84rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .hero h2 {
+      margin: 18px 0 14px;
+      font-size: clamp(2.3rem, 5vw, 5rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #ffffff 0%, #b7c7ff 32%, #69e7ff 74%, #ffd280 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.75;
+      max-width: 64ch;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 26px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .stat strong { display: block; font-size: 1.5rem; }
+    .stat span { color: var(--muted); font-size: 0.88rem; }
+
+    .hero-card {
+      position: relative;
+      padding: 26px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(10, 17, 37, 0.95), rgba(8, 11, 28, 0.9));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: floatY 8s ease-in-out infinite;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(109,124,255,0.22), transparent 68%);
+    }
+
+    .hero-panel {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .micro-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      min-height: 110px;
+    }
+    .micro-card h4 { margin: 0 0 8px; font-size: 0.92rem; }
+    .micro-card p { margin: 0; font-size: 0.87rem; line-height: 1.55; color: var(--muted); }
+
+    .section {
+      position: relative;
+      padding: 40px 0 84px;
+      z-index: 1;
+    }
+    .section.alt {
+      background: linear-gradient(180deg, rgba(9,12,28,0.74), rgba(7,10,20,0.32));
+      border-top: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .section-head h3 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.7rem);
+      letter-spacing: -0.04em;
+    }
+    .section-head p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 72ch;
+      line-height: 1.72;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .tool-card {
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .tool-card label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+      color: #cbd7f2;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tool-card input,
+    .tool-card select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 999px;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .switch input { accent-color: var(--cyan); }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(12, 17, 35, 0.92), rgba(9, 12, 25, 0.92));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 22px 22px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+    .panel-head h4 { margin: 0; font-size: 1.18rem; }
+    .panel-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 0 22px 18px;
+      margin-top: 10px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .periodic-wrap { padding: 0 18px 20px; }
+    .periodic {
+      display: grid;
+      grid-template-columns: repeat(18, minmax(0, 1fr));
+      grid-auto-rows: 64px;
+      gap: 8px;
+      min-width: 960px;
+      padding: 6px 4px 12px;
+    }
+
+    .ptable-shell {
+      overflow: auto;
+      border-radius: 22px;
+      margin: 0 18px 20px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .element {
+      position: relative;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.22s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    .element::before {
+      content: "";
+      position: absolute;
+      inset: auto -10px -10px auto;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 66%);
+      pointer-events: none;
+    }
+    .element:hover { transform: translateY(-4px) scale(1.02); border-color: rgba(255,255,255,0.22); }
+    .element.selected {
+      border-color: rgba(255,255,255,0.5);
+      box-shadow: 0 0 0 2px rgba(34,211,238,0.35), 0 0 28px rgba(34,211,238,0.18);
+      transform: translateY(-5px);
+    }
+    .element .num { font-size: 0.64rem; opacity: 0.78; }
+    .element .sym { font-size: 1.12rem; font-weight: 800; letter-spacing: -0.03em; }
+    .element .name { font-size: 0.64rem; opacity: 0.88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .alkali { background: linear-gradient(180deg, rgba(255, 99, 132, 0.27), rgba(95, 30, 49, 0.42)); }
+    .alkaline { background: linear-gradient(180deg, rgba(255, 170, 96, 0.28), rgba(102, 55, 24, 0.42)); }
+    .transition { background: linear-gradient(180deg, rgba(79, 163, 255, 0.28), rgba(23, 54, 105, 0.45)); }
+    .post-transition { background: linear-gradient(180deg, rgba(70, 214, 179, 0.26), rgba(20, 73, 62, 0.46)); }
+    .metalloid { background: linear-gradient(180deg, rgba(248, 184, 78, 0.28), rgba(103, 69, 20, 0.44)); }
+    .nonmetal { background: linear-gradient(180deg, rgba(46, 213, 115, 0.24), rgba(21, 83, 47, 0.46)); }
+    .halogen { background: linear-gradient(180deg, rgba(255, 106, 213, 0.28), rgba(91, 22, 72, 0.45)); }
+    .noble { background: linear-gradient(180deg, rgba(118, 92, 255, 0.26), rgba(46, 29, 102, 0.46)); }
+    .lanthanide { background: linear-gradient(180deg, rgba(255, 210, 128, 0.28), rgba(100, 61, 12, 0.45)); }
+    .actinide { background: linear-gradient(180deg, rgba(255, 126, 126, 0.24), rgba(109, 36, 36, 0.46)); }
+    .unknown { background: linear-gradient(180deg, rgba(148, 163, 184, 0.2), rgba(51, 65, 85, 0.44)); }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .selection-box,
+    .result-box,
+    .triangle-box,
+    .encyclopedia,
+    .facts-box,
+    .scale-grid,
+    .footer-panel {
+      padding: 20px;
+    }
+
+    .selected-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .selected-card {
+      min-height: 150px;
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .selected-card.empty {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      border-style: dashed;
+    }
+    .selected-card .big-sym {
+      font-size: 2.4rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+    .selected-card .meta { color: var(--muted); line-height: 1.65; font-size: 0.92rem; }
+
+    .result-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .tag-ionic { background: rgba(255,107,107,0.14); color: #ffb5b5; }
+    .tag-polar { background: rgba(139,92,246,0.16); color: #d5c6ff; }
+    .tag-covalent { background: rgba(46,213,115,0.14); color: #b9ffcf; }
+    .tag-metallic { background: rgba(79,163,255,0.16); color: #b4d5ff; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .metric strong { display: block; font-size: 1.25rem; }
+    .metric span { font-size: 0.85rem; color: var(--muted); }
+
+    .bond-visual {
+      margin-top: 14px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .bond-stage {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+      min-height: 112px;
+    }
+
+    .atom {
+      position: relative;
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+      font-weight: 900;
+      font-size: 1.4rem;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: inset 0 0 34px rgba(255,255,255,0.08), 0 0 22px rgba(255,255,255,0.05);
+    }
+    .atom-a { background: radial-gradient(circle at 30% 30%, rgba(109,124,255,0.72), rgba(109,124,255,0.1)); }
+    .atom-b { background: radial-gradient(circle at 30% 30%, rgba(34,211,238,0.7), rgba(34,211,238,0.1)); }
+
+    .bond-core {
+      min-width: 140px;
+      text-align: center;
+      position: relative;
+    }
+
+    .bond-line {
+      height: 6px;
+      border-radius: 999px;
+      position: relative;
+      background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.3), rgba(255,255,255,0.15));
+      overflow: hidden;
+    }
+    .bond-line::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0 14px, rgba(255,255,255,0.38) 14px 20px);
+      animation: dash 4s linear infinite;
+    }
+
+    .electron-cloud {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .electron {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff5c4;
+      box-shadow: 0 0 10px rgba(255, 245, 196, 0.82);
+      animation: bob 2.2s ease-in-out infinite;
+    }
+    .electron:nth-child(2) { animation-delay: .15s; }
+    .electron:nth-child(3) { animation-delay: .35s; }
+    .electron:nth-child(4) { animation-delay: .5s; }
+
+    .explain {
+      color: var(--muted);
+      line-height: 1.76;
+      font-size: 0.97rem;
+    }
+
+    .triangle-svg {
+      width: 100%;
+      display: block;
+      border-radius: 24px;
+      background: radial-gradient(circle at 50% 20%, rgba(109,124,255,0.1), rgba(5,7,20,0.6));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .warning {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(248,184,78,0.1);
+      border: 1px solid rgba(248,184,78,0.18);
+      color: #ffe2b1;
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .scale-layout {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .scale-card {
+      border-radius: 26px;
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(12,17,35,0.92), rgba(8,11,24,0.92));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
+    .scale-card h4 { margin: 0 0 10px; font-size: 1.22rem; }
+    .scale-card p { margin: 0 0 10px; color: var(--muted); line-height: 1.72; }
+    .formula {
+      margin: 14px 0;
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.95rem;
+      color: #dce6ff;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 0.94rem;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+    .compare-table th,
+    .compare-table td {
+      text-align: left;
+      padding: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      vertical-align: top;
+    }
+    .compare-table th { color: #d9e3ff; background: rgba(255,255,255,0.03); }
+    .compare-table td { color: var(--muted); }
+
+    .tab-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(109,124,255,0.22), rgba(34,211,238,0.14));
+      border-color: rgba(109,124,255,0.28);
+      color: white;
+    }
+
+    .encyclopedia-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+    }
+
+    .reading-card,
+    .aside-card {
+      border-radius: 24px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 20px;
+    }
+
+    .reading-card h4 { margin: 0 0 10px; font-size: 1.3rem; }
+    .reading-card p,
+    .reading-card li,
+    .aside-card li { color: var(--muted); line-height: 1.76; }
+    .reading-card ul,
+    .aside-card ul { margin: 10px 0 0 18px; padding: 0; }
+
+    .callout {
+      margin-top: 14px;
+      border-radius: 20px;
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+      border-left: 4px solid var(--cyan);
+      color: #d2e6ff;
+      line-height: 1.7;
+    }
+
+    .fact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .fact {
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+      min-height: 184px;
+    }
+    .fact::after {
+      content: "✦";
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      color: rgba(255,255,255,0.18);
+      font-size: 1.4rem;
+    }
+    .fact h5 { margin: 0 0 10px; font-size: 1rem; }
+    .fact p { margin: 0; color: var(--muted); line-height: 1.72; font-size: 0.94rem; }
+
+    footer {
+      padding: 12px 0 60px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .foot-note {
+      color: var(--muted);
+      line-height: 1.76;
+      font-size: 0.95rem;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .badge {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .small-muted { font-size: 0.85rem; color: var(--muted); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 1180px) {
+      .hero-grid,
+      .workbench,
+      .scale-layout,
+      .encyclopedia-grid,
+      .footer-grid { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: repeat(2, 1fr); }
+      .fact-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 20px, 1440px); }
+      .nav-inner { flex-direction: column; align-items: stretch; }
+      .nav-links { justify-content: flex-start; }
+      .stats,
+      .result-grid,
+      .selected-row,
+      .hero-panel,
+      .toolbar,
+      .fact-grid { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .section { padding: 28px 0 64px; }
+      .brand h1, .brand p { white-space: normal; }
+    }
+  </style>
+</head>
+<body data-density="full">
+  <div class="noise"></div>
+
+  <nav>
+    <div class="shell nav-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <div class="ring"></div>
+          <div class="nucleus"></div>
+        </div>
+        <div>
+          <h1>Bondarium Studio</h1>
+          <p>Atlas interactivo de enlaces químicos, electronegatividad y triángulo de Van Arkel–Ketelaar</p>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a class="pill-link" href="#explorador">Explorador</a>
+        <a class="pill-link" href="#escalas">Escalas</a>
+        <a class="pill-link" href="#enciclopedia">Enciclopedia</a>
+        <a class="pill-link" href="#curiosidades">Curiosidades</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <canvas id="heroCanvas"></canvas>
+    <div class="shell hero-grid">
+      <div class="hero-copy">
+        <div class="eyebrow">Química visual • Técnica • Interactiva</div>
+        <h2>
+          Entiende <span class="gradient">qué tipo de enlace</span><br />
+          nace cuando dos átomos se encuentran.
+        </h2>
+        <p>
+          Esta aplicación explica el enlace iónico, covalente no polar, covalente polar y metálico usando dos rutas complementarias: la diferencia de electronegatividad y la lectura del triángulo de Van Arkel–Ketelaar. Incluye modo Pauling, modo Allen, una tabla periódica interactiva, explicaciones técnicas extensas, usos reales, historia, seguridad básica y curiosidades científicas.
+        </p>
+        <div class="hero-cta">
+          <a class="solid-btn" href="#explorador">Abrir laboratorio interactivo</a>
+          <button class="ghost-btn" id="densityToggle">Cambiar a modo resumido</button>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <strong>2</strong>
+            <span>escalas de electronegatividad integradas</span>
+          </div>
+          <div class="stat">
+            <strong>4</strong>
+            <span>familias de enlace comparadas en detalle</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>panel visual con tabla periódica y triángulo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <div class="eyebrow" style="background: rgba(34,211,238,.12); border-color: rgba(34,211,238,.18);">Vista profesional de exposición</div>
+        <h3 style="margin: 16px 0 8px; font-size: 1.8rem;">Diseñada para explicar, impresionar y defender el tema</h3>
+        <p style="margin:0; color: var(--muted); line-height: 1.75;">
+          El enfoque no se queda en “qué enlace sale”. Aquí se interpreta por qué ocurre, qué parámetros lo respaldan, dónde se ubica en el triángulo, cómo cambia la polaridad, qué propiedades físicas aparecen y por qué esos enlaces importan en materiales, biología, industria y tecnología.
+        </p>
+        <div class="hero-panel">
+          <div class="micro-card">
+            <h4>Pauling</h4>
+            <p>Usa energías de enlace y convirtió la electronegatividad en una herramienta predictiva clásica para estimar polaridad y carácter iónico.</p>
+          </div>
+          <div class="micro-card">
+            <h4>Allen</h4>
+            <p>Propone una base espectroscópica: la electronegatividad como energía promedio de los electrones de valencia del átomo libre.</p>
+          </div>
+          <div class="micro-card">
+            <h4>Van Arkel–Ketelaar</h4>
+            <p>Organiza enlaces según electronegatividad media y diferencia de electronegatividad para ubicar regiones iónicas, covalentes y metálicas.</p>
+          </div>
+          <div class="micro-card">
+            <h4>Modo presentación</h4>
+            <p>Contenido con animaciones, colores intercalados, paneles tipo dashboard, control de secciones y estética corporativa de laboratorio digital.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section alt" id="explorador">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <h3>Laboratorio interactivo de enlace</h3>
+          <p>
+            Selecciona dos elementos. El sistema calcula la diferencia de electronegatividad, estima el carácter iónico, interpreta el tipo de enlace dominante y coloca el par atómico sobre el triángulo de Van Arkel–Ketelaar. También puedes filtrar contenido para mostrar solo lo que te convenga en clase.
+          </p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tool-card">
+          <label for="scaleSelect">Escala activa</label>
+          <select id="scaleSelect">
+            <option value="pauling">Pauling (recomendada para clasificación escolar)</option>
+            <option value="allen">Allen (espectroscópica)</option>
+          </select>
+        </div>
+        <div class="tool-card">
+          <label for="searchInput">Buscar elemento</label>
+          <input id="searchInput" type="text" placeholder="Ej. Na, O, carbono, cloro..." />
+        </div>
+        <div class="tool-card">
+          <label>Ejemplos rápidos</label>
+          <div class="toggle-row">
+            <button class="mini-btn example-btn" data-a="Na" data-b="Cl">Na + Cl</button>
+            <button class="mini-btn example-btn" data-a="H" data-b="O">H + O</button>
+            <button class="mini-btn example-btn" data-a="Cu" data-b="Cu">Cu + Cu</button>
+          </div>
+        </div>
+        <div class="tool-card">
+          <label>Modo de lectura</label>
+          <div class="toggle-row">
+            <button class="mini-btn" id="fullModeBtn">Completo</button>
+            <button class="mini-btn" id="compactModeBtn">Resumido</button>
+            <button class="mini-btn" id="clearSelectionBtn">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top:-4px;">
+        <div class="tool-card" style="grid-column: 1 / -1;">
+          <label>Controla qué secciones quieres ver</label>
+          <div class="toggle-row">
+            <label class="switch"><input type="checkbox" id="toggleFacts" checked /> Curiosidades</label>
+            <label class="switch"><input type="checkbox" id="toggleHistory" checked /> Historia</label>
+            <label class="switch"><input type="checkbox" id="toggleUses" checked /> Aplicaciones</label>
+            <label class="switch"><input type="checkbox" id="toggleSafety" checked /> Seguridad y compatibilidad</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="workbench">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h4>Tabla periódica interactiva</h4>
+              <p>Haz clic en dos elementos. Si vuelves a hacer clic en uno ya elegido, se deselecciona. Si Allen no tiene dato para algún elemento, la app te avisará y usará Pauling como respaldo para no dejar el análisis vacío.</p>
+            </div>
+          </div>
+          <div class="legend">
+            <span><i class="dot alkali"></i> Alcalinos</span>
+            <span><i class="dot alkaline"></i> Alcalinotérreos</span>
+            <span><i class="dot transition"></i> Transición</span>
+            <span><i class="dot post-transition"></i> Post-transición</span>
+            <span><i class="dot metalloid"></i> Metaloides</span>
+            <span><i class="dot nonmetal"></i> No metales</span>
+            <span><i class="dot halogen"></i> Halógenos</span>
+            <span><i class="dot noble"></i> Gases nobles</span>
+            <span><i class="dot lanthanide"></i> Lantánidos</span>
+            <span><i class="dot actinide"></i> Actínidos</span>
+          </div>
+          <div class="ptable-shell">
+            <div class="periodic" id="periodicTable"></div>
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="panel selection-box">
+            <h4 style="margin:0;">Selección actual</h4>
+            <p class="small-muted">La lectura combina química descriptiva y criterios numéricos. Para triángulo y clasificación rápida, se usan Δχ y χ̄.</p>
+            <div class="selected-row" id="selectedRow"></div>
+          </div>
+
+          <div class="panel result-box">
+            <div id="resultContent">
+              <h4 style="margin-top:0;">Diagnóstico de enlace</h4>
+              <p class="explain">Elige dos elementos para desbloquear el análisis. Puedes comenzar con Na + Cl para iónico, H + O para covalente polar o Cu + Cu para metálico.</p>
+            </div>
+          </div>
+
+          <div class="panel triangle-box">
+            <h4 style="margin-top:0;">Triángulo de Van Arkel–Ketelaar</h4>
+            <p class="small-muted">Eje horizontal: electronegatividad media. Eje vertical: diferencia de electronegatividad. El punto brillante aparece cuando seleccionas dos elementos.</p>
+            <svg class="triangle-svg" viewBox="0 0 700 430" role="img" aria-label="Triángulo de Van Arkel Ketelaar">
+              <defs>
+                <linearGradient id="covG" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#22c55e" stop-opacity="0.45" />
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.18" />
+                </linearGradient>
+                <linearGradient id="ionG" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#ff6b6b" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="#f97316" stop-opacity="0.18" />
+                </linearGradient>
+                <linearGradient id="metG" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.18" />
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="8" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <rect x="0" y="0" width="700" height="430" fill="transparent"/>
+              <polygon points="100,360 600,360 350,55" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+              <polygon points="100,360 350,55 260,250" fill="url(#ionG)"/>
+              <polygon points="100,360 600,360 350,290" fill="url(#metG)"/>
+              <polygon points="350,290 600,360 350,55" fill="url(#covG)"/>
+
+              <line x1="100" y1="360" x2="630" y2="360" stroke="rgba(255,255,255,0.28)" />
+              <line x1="100" y1="360" x2="100" y2="30" stroke="rgba(255,255,255,0.28)" />
+
+              <g fill="rgba(255,255,255,0.7)" font-size="13">
+                <text x="635" y="364">χ̄</text>
+                <text x="74" y="32">Δχ</text>
+                <text x="84" y="378">0.7</text>
+                <text x="266" y="378">1.8</text>
+                <text x="440" y="378">2.9</text>
+                <text x="598" y="378">4.0</text>
+                <text x="76" y="365">0</text>
+                <text x="70" y="284">1</text>
+                <text x="70" y="203">2</text>
+                <text x="70" y="122">3</text>
+                <text x="70" y="44">4</text>
+              </g>
+
+              <g fill="#e7eefc" font-weight="700" font-size="20">
+                <text x="315" y="40">Iónico</text>
+                <text x="482" y="210">Covalente</text>
+                <text x="154" y="330">Metálico</text>
+              </g>
+
+              <g font-size="14" fill="#d0ddff" opacity="0.9">
+                <text x="326" y="84">NaCl</text>
+                <circle cx="345" cy="92" r="5" fill="#ffafaf" />
+                <text x="530" y="318">Cl₂</text>
+                <circle cx="552" cy="305" r="5" fill="#baffcb" />
+                <text x="155" y="350">Cu</text>
+                <circle cx="175" cy="337" r="5" fill="#abd2ff" />
+              </g>
+
+              <circle id="bondGlow" cx="350" cy="250" r="17" fill="rgba(34,211,238,0.24)" filter="url(#glow)" opacity="0"></circle>
+              <circle id="bondPoint" cx="350" cy="250" r="8" fill="#69e7ff" stroke="white" stroke-width="2" opacity="0"></circle>
+              <text id="bondLabel" x="365" y="244" fill="#ffffff" font-size="15" font-weight="700" opacity="0">Par seleccionado</text>
+            </svg>
+            <div class="warning" id="triangleNote">La posición final se vuelve visible cuando el sistema tiene dos elementos seleccionados. Recuerda: el triángulo es una guía de tendencia, no un veredicto absoluto para todos los materiales complejos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="escalas">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <h3>Las dos escalas de electronegatividad</h3>
+          <p>
+            La aplicación compara dos formas de pensar la atracción electrónica. Una es histórica y muy usada en cursos de química general; la otra es más rigurosa desde el punto de vista espectroscópico y de estructura electrónica.
+          </p>
+        </div>
+      </div>
+
+      <div class="scale-layout">
+        <article class="scale-card">
+          <h4>Escala de Pauling</h4>
+          <p>
+            Linus Pauling popularizó la electronegatividad en 1932 al vincularla con diferencias entre energías de enlace. En su versión clásica, si un enlace A–B es más fuerte de lo esperado respecto a A–A y B–B, se interpreta que existe una contribución extra relacionada con polarización electrónica e incremento del carácter iónico.
+          </p>
+          <div class="formula">|χA − χB| ≈ √(DAB − (DAA + DBB)/2)</div>
+          <p>
+            Esta escala es útil porque da una lectura rápida en clase: diferencias pequeñas suelen apuntar a covalencia no polar, diferencias intermedias a covalencia polar y diferencias grandes a mayor carácter iónico. Es una excelente herramienta pedagógica, aunque no captura por sí sola toda la complejidad cuántica de compuestos de transición o sólidos muy peculiares.
+          </p>
+          <div class="callout" data-topic="facts">
+            <strong>Idea clave:</strong> Pauling no propuso “cajitas rígidas”, sino una manera de cuantificar tendencias. Por eso en esta app la clasificación se acompaña con el triángulo de Van Arkel–Ketelaar, que muestra zonas y transiciones, no fronteras totalmente tajantes.
+          </div>
+        </article>
+
+        <article class="scale-card">
+          <h4>Escala de Allen</h4>
+          <p>
+            La escala de Allen apareció en 1989 y define la electronegatividad como la energía promedio de un electrón de valencia en el átomo libre en estado fundamental. A diferencia del enfoque termodinámico de Pauling, Allen se apoya en datos espectroscópicos. Por eso se considera una formulación más directamente conectada con la estructura electrónica atómica.
+          </p>
+          <div class="formula">χAllen = energía media de los electrones de valencia del átomo libre</div>
+          <p>
+            Una ventaja elegante es que permite asignar valores coherentes a varios gases nobles, lo que resulta útil para comparar tendencias periódicas. En docencia avanzada también sirve para discutir por qué la electronegatividad no es una constante mágica única, sino una propiedad dependiente de la definición empleada.
+          </p>
+          <div class="callout" data-topic="facts">
+            <strong>Detalle interesante:</strong> la escala de Allen suele correlacionar bastante bien con la de Pauling en muchos elementos representativos, pero no son intercambiables sin contexto. Cuando cambias de escala, cambian también los números, la sensibilidad y algunos matices interpretativos.
+          </div>
+        </article>
+      </div>
+
+      <div class="panel scale-grid" style="margin-top: 18px;">
+        <h4 style="margin-top:0;">Comparación directa entre ambas escalas</h4>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>Pauling</th>
+              <th>Allen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base conceptual</td>
+              <td>Energías de enlace y exceso de estabilidad</td>
+              <td>Energía promedio de los electrones de valencia</td>
+            </tr>
+            <tr>
+              <td>Fortaleza didáctica</td>
+              <td>Muy intuitiva para clasificar polaridad y carácter iónico</td>
+              <td>Excelente para discutir estructura electrónica y espectroscopía</td>
+            </tr>
+            <tr>
+              <td>Uso en esta app</td>
+              <td>Modo principal de clasificación escolar</td>
+              <td>Modo comparativo y de análisis fino</td>
+            </tr>
+            <tr>
+              <td>Límite importante</td>
+              <td>Los cortes numéricos son aproximados, no absolutos</td>
+              <td>No siempre hay valores cómodamente disponibles para todos los contextos didácticos</td>
+            </tr>
+            <tr>
+              <td>Lectura recomendada</td>
+              <td>Cuando el profesor pide explicar tipo de enlace de forma clásica</td>
+              <td>Cuando se quiere justificar la base física de la electronegatividad</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="enciclopedia">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <h3>Enciclopedia técnica de enlace químico</h3>
+          <p>
+            Aquí no se resume de forma superficial. Cada familia se explica con historia, mecanismo, propiedades, aplicaciones, límites conceptuales, compatibilidad básica y detalles curiosos útiles para defender el trabajo oralmente.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel encyclopedia">
+        <div class="tab-row" id="tabRow"></div>
+        <div class="encyclopedia-grid">
+          <div class="reading-card" id="encyclopediaMain"></div>
+          <div class="aside-card" id="encyclopediaSide"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="curiosidades">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <h3>Curiosidades científicas para enriquecer la presentación</h3>
+          <p>
+            Estas tarjetas están pensadas para que la página no se sienta “vacía” ni genérica. Sirven para demostrar dominio, hacer la exposición más memorable y conectar la teoría de enlace con fenómenos reales, materiales especiales y detalles históricos elegantes.
+          </p>
+        </div>
+        <button class="solid-btn" id="shuffleFactsBtn">Mostrar otras curiosidades</button>
+      </div>
+      <div class="fact-grid" id="factGrid"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="shell footer-grid">
+      <div class="panel footer-panel">
+        <h4 style="margin-top:0;">Cómo usar y adaptar este proyecto</h4>
+        <p class="foot-note">
+          Este archivo funciona como una sola página HTML con CSS y JavaScript integrados. Si quieres entregarlo en VS Code, guárdalo como <strong>index.html</strong> y ábrelo con Live Server o directamente en el navegador. Si deseas cambiar colores, textos, secciones o ejemplos, todo está dentro del mismo archivo para que no tengas que perseguir carpetas externas.
+        </p>
+        <div class="badge-row">
+          <span class="badge">Animaciones propias en canvas y CSS</span>
+          <span class="badge">Tabla periódica dinámica</span>
+          <span class="badge">Modo completo y resumido</span>
+          <span class="badge">Filtros para ocultar secciones</span>
+        </div>
+      </div>
+      <div class="panel footer-panel">
+        <h4 style="margin-top:0;">Nota académica importante</h4>
+        <p class="foot-note">
+          La química real no siempre cabe en etiquetas rígidas. Hay compuestos con comportamiento mixto, sólidos de red covalente, materiales intermetálicos, sistemas con resonancia, coordinación y efectos cristalinos que no se explican por completo solo con una diferencia de electronegatividad. Por eso esta app usa una lógica mixta: números + interpretación + triángulo.
+        </p>
+        <p class="foot-note">
+          Para seguridad experimental real, consulta siempre hojas de datos de seguridad (SDS) y protocolos del laboratorio. La sección de compatibilidad aquí es educativa y orientativa, no sustituye documentación oficial.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const RAW_JSON_URL = 'https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json';
+
+    const ALLEN_VALUES = {
+      H: 2.300, He: 4.160,
+      Li: 0.912, Be: 1.576, B: 2.051, C: 2.544, N: 3.066, O: 3.610, F: 4.193, Ne: 4.787,
+      Na: 0.869, Mg: 1.293, Al: 1.613, Si: 1.916, P: 2.253, S: 2.589, Cl: 2.869, Ar: 3.242,
+      K: 0.734, Ca: 1.034, Sc: 1.190, Ti: 1.380, V: 1.530, Cr: 1.650, Mn: 1.750, Fe: 1.800, Co: 1.840, Ni: 1.880, Cu: 1.850, Zn: 1.588,
+      Ga: 1.756, Ge: 1.994, As: 2.211, Se: 2.424, Br: 2.685, Kr: 2.966,
+      Rb: 0.706, Sr: 0.963, Y: 1.120, Zr: 1.320, Nb: 1.410, Mo: 1.470, Tc: 1.510, Ru: 1.540, Rh: 1.560, Pd: 1.580, Ag: 1.870, Cd: 1.521,
+      In: 1.656, Sn: 1.824, Sb: 1.984, Te: 2.158, I: 2.359, Xe: 2.582,
+      Cs: 0.659, Ba: 0.881, La: 1.090, Hf: 1.160, Ta: 1.340, W: 1.470, Re: 1.600, Os: 1.650, Ir: 1.680, Pt: 1.720, Au: 1.920, Hg: 1.765,
+      Tl: 1.789, Pb: 1.854, Bi: 2.010, Po: 2.190, At: 2.390, Rn: 2.600
+    };
+
+    const ES_NAMES = {
+      H: 'Hidrógeno', He: 'Helio', Li: 'Litio', Be: 'Berilio', B: 'Boro', C: 'Carbono', N: 'Nitrógeno', O: 'Oxígeno', F: 'Flúor', Ne: 'Neón',
+      Na: 'Sodio', Mg: 'Magnesio', Al: 'Aluminio', Si: 'Silicio', P: 'Fósforo', S: 'Azufre', Cl: 'Cloro', Ar: 'Argón', K: 'Potasio', Ca: 'Calcio',
+      Fe: 'Hierro', Co: 'Cobalto', Ni: 'Níquel', Cu: 'Cobre', Zn: 'Zinc', Br: 'Bromo', Ag: 'Plata', I: 'Yodo', Au: 'Oro', Hg: 'Mercurio',
+      Pb: 'Plomo', Sn: 'Estaño', Xe: 'Xenón', Kr: 'Kriptón', Rn: 'Radón', Ti: 'Titanio', Cr: 'Cromo', Mn: 'Manganeso', V: 'Vanadio',
+      Sr: 'Estroncio', Ba: 'Bario', Cs: 'Cesio', La: 'Lantano', Pt: 'Platino', Pd: 'Paladio', Ga: 'Galio', Ge: 'Germanio', As: 'Arsénico',
+      Se: 'Selenio', Sb: 'Antimonio', Te: 'Telurio', Bi: 'Bismuto', Po: 'Polonio', At: 'Astato', Sc: 'Escandio', Y: 'Itrio', Zr: 'Circonio',
+      Nb: 'Niobio', Mo: 'Molibdeno', W: 'Wolframio', Re: 'Renio', Os: 'Osmio', Ir: 'Iridio', Tl: 'Talio', In: 'Indio'
+    };
+
+    const FALLBACK_ELEMENTS = [
+      {number:1,symbol:'H',name:'Hydrogen',x:1,y:1,category:'diatomic nonmetal',pauling:2.20},
+      {number:2,symbol:'He',name:'Helium',x:18,y:1,category:'noble gas',pauling:null},
+      {number:3,symbol:'Li',name:'Lithium',x:1,y:2,category:'alkali metal',pauling:0.98},
+      {number:4,symbol:'Be',name:'Beryllium',x:2,y:2,category:'alkaline earth metal',pauling:1.57},
+      {number:5,symbol:'B',name:'Boron',x:13,y:2,category:'metalloid',pauling:2.04},
+      {number:6,symbol:'C',name:'Carbon',x:14,y:2,category:'polyatomic nonmetal',pauling:2.55},
+      {number:7,symbol:'N',name:'Nitrogen',x:15,y:2,category:'diatomic nonmetal',pauling:3.04},
+      {number:8,symbol:'O',name:'Oxygen',x:16,y:2,category:'diatomic nonmetal',pauling:3.44},
+      {number:9,symbol:'F',name:'Fluorine',x:17,y:2,category:'diatomic nonmetal',pauling:3.98},
+      {number:10,symbol:'Ne',name:'Neon',x:18,y:2,category:'noble gas',pauling:null},
+      {number:11,symbol:'Na',name:'Sodium',x:1,y:3,category:'alkali metal',pauling:0.93},
+      {number:12,symbol:'Mg',name:'Magnesium',x:2,y:3,category:'alkaline earth metal',pauling:1.31},
+      {number:13,symbol:'Al',name:'Aluminum',x:13,y:3,category:'post-transition metal',pauling:1.61},
+      {number:14,symbol:'Si',name:'Silicon',x:14,y:3,category:'metalloid',pauling:1.90},
+      {number:15,symbol:'P',name:'Phosphorus',x:15,y:3,category:'polyatomic nonmetal',pauling:2.19},
+      {number:16,symbol:'S',name:'Sulfur',x:16,y:3,category:'polyatomic nonmetal',pauling:2.58},
+      {number:17,symbol:'Cl',name:'Chlorine',x:17,y:3,category:'diatomic nonmetal',pauling:3.16},
+      {number:18,symbol:'Ar',name:'Argon',x:18,y:3,category:'noble gas',pauling:null},
+      {number:19,symbol:'K',name:'Potassium',x:1,y:4,category:'alkali metal',pauling:0.82},
+      {number:20,symbol:'Ca',name:'Calcium',x:2,y:4,category:'alkaline earth metal',pauling:1.00},
+      {number:21,symbol:'Sc',name:'Scandium',x:3,y:4,category:'transition metal',pauling:1.36},
+      {number:22,symbol:'Ti',name:'Titanium',x:4,y:4,category:'transition metal',pauling:1.54},
+      {number:23,symbol:'V',name:'Vanadium',x:5,y:4,category:'transition metal',pauling:1.63},
+      {number:24,symbol:'Cr',name:'Chromium',x:6,y:4,category:'transition metal',pauling:1.66},
+      {number:25,symbol:'Mn',name:'Manganese',x:7,y:4,category:'transition metal',pauling:1.55},
+      {number:26,symbol:'Fe',name:'Iron',x:8,y:4,category:'transition metal',pauling:1.83},
+      {number:27,symbol:'Co',name:'Cobalt',x:9,y:4,category:'transition metal',pauling:1.88},
+      {number:28,symbol:'Ni',name:'Nickel',x:10,y:4,category:'transition metal',pauling:1.91},
+      {number:29,symbol:'Cu',name:'Copper',x:11,y:4,category:'transition metal',pauling:1.90},
+      {number:30,symbol:'Zn',name:'Zinc',x:12,y:4,category:'transition metal',pauling:1.65},
+      {number:31,symbol:'Ga',name:'Gallium',x:13,y:4,category:'post-transition metal',pauling:1.81},
+      {number:32,symbol:'Ge',name:'Germanium',x:14,y:4,category:'metalloid',pauling:2.01},
+      {number:33,symbol:'As',name:'Arsenic',x:15,y:4,category:'metalloid',pauling:2.18},
+      {number:34,symbol:'Se',name:'Selenium',x:16,y:4,category:'polyatomic nonmetal',pauling:2.55},
+      {number:35,symbol:'Br',name:'Bromine',x:17,y:4,category:'diatomic nonmetal',pauling:2.96},
+      {number:36,symbol:'Kr',name:'Krypton',x:18,y:4,category:'noble gas',pauling:3.00},
+      {number:47,symbol:'Ag',name:'Silver',x:11,y:5,category:'transition metal',pauling:1.93},
+      {number:53,symbol:'I',name:'Iodine',x:17,y:5,category:'diatomic nonmetal',pauling:2.66},
+      {number:54,symbol:'Xe',name:'Xenon',x:18,y:5,category:'noble gas',pauling:2.60},
+      {number:56,symbol:'Ba',name:'Barium',x:2,y:6,category:'alkaline earth metal',pauling:0.89},
+      {number:57,symbol:'La',name:'Lanthanum',x:3,y:9,category:'lanthanide',pauling:1.10},
+      {number:78,symbol:'Pt',name:'Platinum',x:10,y:6,category:'transition metal',pauling:2.28},
+      {number:79,symbol:'Au',name:'Gold',x:11,y:6,category:'transition metal',pauling:2.54},
+      {number:80,symbol:'Hg',name:'Mercury',x:12,y:6,category:'transition metal',pauling:2.00},
+      {number:82,symbol:'Pb',name:'Lead',x:14,y:6,category:'post-transition metal',pauling:2.33},
+      {number:86,symbol:'Rn',name:'Radon',x:18,y:6,category:'noble gas',pauling:2.20}
+    ];
+
+    const ENCYCLOPEDIA = {
+      ionic: {
+        label: 'Iónico',
+        tagClass: 'tag-ionic',
+        title: 'Enlace iónico: atracción electrostática después de una transferencia electrónica efectiva',
+        intro: 'El enlace iónico aparece cuando la diferencia de electronegatividad entre dos especies es suficientemente grande para favorecer una distribución de carga muy desigual. En términos sencillos, un átomo tiende a perder densidad electrónica y el otro a ganarla. El resultado no es solo “un electrón que salta”, sino la formación de una red de cationes y aniones cuya estabilidad está gobernada por fuerzas coulómbicas a gran escala.',
+        history: 'En el siglo XX, la consolidación de la teoría electrónica del enlace permitió entender por qué sales como NaCl no son moléculas aisladas discretas en estado sólido, sino redes cristalinas extensas. La energía reticular y el tratamiento de Madelung ayudaron a explicar la enorme estabilidad de muchos sólidos iónicos.',
+        properties: [
+          'Suelen presentar puntos de fusión y ebullición altos porque separar los iones de la red requiere mucha energía.',
+          'Son duros, pero también frágiles: al desplazar planos de iones, cargas iguales pueden quedar enfrentadas y la estructura se fractura.',
+          'No conducen como sólidos perfectos, pero sí cuando están fundidos o disueltos, porque los iones adquieren movilidad.',
+          'Tienen gran afinidad por disolventes polares como el agua, aunque la solubilidad real depende del balance entre hidratación y energía reticular.'
+        ],
+        uses: [
+          'Electrolitos y sales industriales para síntesis, tratamiento de agua y procesos metalúrgicos.',
+          'Óxidos iónicos como MgO y Al2O3 se usan como materiales refractarios y cerámicos de alto desempeño.',
+          'Fluoruros, cloruros y sulfatos aparecen en medicina, agricultura, baterías y formulaciones industriales.'
+        ],
+        safety: [
+          'No todos los compuestos iónicos son inocentes: algunos son corrosivos, oxidantes o muy tóxicos.',
+          'Nunca debe asumirse que “como es una sal, es segura”. El fluoruro de hidrógeno, por ejemplo, es extremadamente peligroso aunque su química tenga un componente muy polar/iónico.',
+          'Evita generalizaciones peligrosas: la compatibilidad depende de la sal concreta, del solvente, de la temperatura y del pH.'
+        ],
+        facts: [
+          'El cloruro de sodio sólido no está hecho de “moléculas de sal” aisladas, sino de una red tridimensional ordenada.',
+          'Muchos sólidos iónicos emiten colores característicos en pruebas de flama por transiciones electrónicas del catión.'
+        ],
+        sideTitle: 'Cómo defenderlo oralmente',
+        sideList: [
+          'Idea poderosa: en un sólido iónico importa la red completa, no solo una pareja de átomos.',
+          'Ejemplos útiles: NaCl, MgO, CaF2, KBr.',
+          'Respuesta elegante: “más diferencia de electronegatividad” no significa que todo sea 100% iónico; casi siempre existe mezcla de caracteres.'
+        ]
+      },
+      covalent: {
+        label: 'Covalente no polar',
+        tagClass: 'tag-covalent',
+        title: 'Enlace covalente no polar: compartir electrones con simetría casi equilibrada',
+        intro: 'En este caso los electrones se comparten entre los átomos sin que uno de ellos domine claramente la densidad electrónica. Suele aparecer cuando los dos átomos son iguales o muy parecidos en electronegatividad, como en H2, Cl2 o en muchas porciones apolares de moléculas orgánicas.',
+        history: 'El desarrollo del modelo de pares electrónicos de Gilbert N. Lewis en 1916 fue decisivo para comprender por qué tantos compuestos existen gracias a electrones compartidos y no a transferencias completas. Más tarde, la mecánica cuántica refinó la idea con orbitales moleculares, enlaces sigma y pi, orden de enlace y densidad electrónica.',
+        properties: [
+          'Muchos compuestos covalentes moleculares tienen puntos de fusión y ebullición relativamente bajos frente a los sólidos iónicos.',
+          'La falta de polaridad fuerte reduce su solubilidad en agua y aumenta su afinidad por solventes no polares.',
+          'No suelen conducir electricidad como materiales moleculares, aunque existen excepciones espectaculares en sólidos covalentes extendidos como grafito o grafeno.'
+        ],
+        uses: [
+          'Base estructural de hidrocarburos, combustibles, polímeros y una enorme fracción de la química orgánica.',
+          'Materiales de red covalente como diamante, silicio y carburo de silicio son esenciales en abrasivos, electrónica y semiconductores.',
+          'Gases diatómicos no polares participan en atmósferas protectoras, síntesis y control de procesos.'
+        ],
+        safety: [
+          'Que una sustancia tenga enlaces covalentes no la vuelve segura: el benceno, el monóxido de carbono y numerosos solventes orgánicos son peligrosos.',
+          'Muchos compuestos covalentes son inflamables, volátiles o tóxicos; siempre se requiere ventilación adecuada y lectura de SDS.'
+        ],
+        facts: [
+          'El nitrógeno molecular N2 posee un triple enlace muy fuerte, por eso el aire es tan estable químicamente en condiciones normales.',
+          'El diamante y el grafito son ambos carbono puro, pero sus redes covalentes distintas producen propiedades totalmente opuestas.'
+        ],
+        sideTitle: 'Punto fino para lucirte',
+        sideList: [
+          'No confundas “covalente” con “molecular” en todos los casos: también existen redes covalentes gigantes.',
+          'Un enlace covalente puede ser simple, doble o triple según el número de pares compartidos.',
+          'La geometría molecular puede cancelar dipolos incluso cuando algunos enlaces individuales sean polares.'
+        ]
+      },
+      polar: {
+        label: 'Covalente polar',
+        tagClass: 'tag-polar',
+        title: 'Enlace covalente polar: compartir electrones, pero con una desigualdad medible',
+        intro: 'Aquí los electrones siguen siendo compartidos, pero la nube electrónica se desplaza hacia el átomo más electronegativo. Aparecen cargas parciales δ− y δ+, y con ellas emergen propiedades clave como dipolos, interacciones intermoleculares más intensas y comportamientos especiales en disolución.',
+        history: 'El estudio de momentos dipolares a principios del siglo XX, junto con el concepto de electronegatividad, permitió cuantificar la polaridad más allá de intuiciones cualitativas. El agua, el HF y muchos grupos funcionales orgánicos se volvieron ejemplos clásicos de cómo la distribución electrónica cambia propiedades macroscópicas.',
+        properties: [
+          'Aumenta la atracción intermolecular respecto a moléculas no polares de masa similar.',
+          'Puede elevar puntos de ebullición y favorecer disolución en medios polares.',
+          'Es la base de interacciones cruciales en bioquímica, como puentes de hidrógeno, reconocimiento molecular y estabilidad de biomoléculas.'
+        ],
+        uses: [
+          'Solventes polares en síntesis y análisis químico.',
+          'Polímeros, materiales piezoeléctricos y recubrimientos funcionales.',
+          'Procesos biológicos donde la polaridad determina transporte, catálisis y estructura molecular.'
+        ],
+        safety: [
+          'Algunos compuestos polares son particularmente agresivos o peligrosos: ácidos fuertes, haluros de hidrógeno y solventes que atraviesan piel exigen mucha precaución.',
+          'Nunca mezcles solventes o reactivos solo por “tipo de enlace”. La compatibilidad química depende del compuesto específico, no de una etiqueta general.'
+        ],
+        facts: [
+          'El agua no solo es polar: su geometría angular evita que los dipolos se cancelen, y eso cambia completamente su comportamiento físico.',
+          'CO2 tiene enlaces C=O polares, pero la molécula total es lineal y apolar; esa diferencia entre polaridad de enlace y polaridad molecular es un clásico de examen.'
+        ],
+        sideTitle: 'Frase potente para exponer',
+        sideList: [
+          '“No basta con ver el enlace: también hay que ver la geometría molecular para decidir la polaridad total”.',
+          'Ejemplos útiles: H2O, HCl, NH3, SO2.',
+          'La polaridad explica desde solubilidad hasta puntos de ebullición y reactividad.'
+        ]
+      },
+      metallic: {
+        label: 'Metálico',
+        tagClass: 'tag-metallic',
+        title: 'Enlace metálico: una red de núcleos inmersos en electrones deslocalizados',
+        intro: 'El enlace metálico no se entiende bien con la imagen de “dos átomos compartiendo un par” ni con la de “un átomo entrega y otro recibe” como en una sal. Aquí existe una red de centros positivos acompañados por electrones de valencia relativamente deslocalizados. Esa deslocalización explica conductividad, brillo, maleabilidad y ductilidad.',
+        history: 'Los primeros modelos clásicos, como el de Drude, intentaron explicar la conducción en metales. Más tarde, la teoría de bandas mostró que la estructura electrónica extendida permite electrones móviles y niveles energéticos casi continuos, base de la conducta metálica macroscópica.',
+        properties: [
+          'Alta conductividad eléctrica y térmica.',
+          'Maleabilidad y ductilidad: los planos del sólido pueden deslizarse sin romper por completo la cohesión.',
+          'Brillo metálico por interacción eficiente con la luz visible.',
+          'Capacidad de formar aleaciones con propiedades ajustables.'
+        ],
+        uses: [
+          'Cableado eléctrico, estructuras, motores, contactos, turbinas, prótesis, utensilios, microelectrónica y catálisis.',
+          'Aleaciones como acero, bronce, latón, superaleaciones de níquel y nitinol muestran cómo el enlace metálico puede diseñarse para funciones muy distintas.'
+        ],
+        safety: [
+          'No todos los metales se comportan igual: metales alcalinos reaccionan violentamente con agua; otros generan corrosión galvánica si se combinan mal en presencia de electrolitos.',
+          'La compatibilidad metálica es un tema de ingeniería real: aluminio y cobre, por ejemplo, requieren diseño cuidadoso para evitar problemas electroquímicos.'
+        ],
+        facts: [
+          'El oro es amarillo por efectos relativistas en sus electrones, algo rarísimo a escala cotidiana.',
+          'El nitinol puede “recordar” su forma original gracias a transformaciones estructurales reversibles.'
+        ],
+        sideTitle: 'Cómo sonar pro',
+        sideList: [
+          'Usa la frase “electrones deslocalizados” en vez de solo “mar de electrones” si quieres sonar más técnico.',
+          'Ejemplos útiles: Cu, Fe, Al, Ag, Au.',
+          'Conecta el tema con aleaciones: ahí se ve que enlace y estructura gobiernan propiedades reales.'
+        ]
+      },
+      triangle: {
+        label: 'Triángulo Van Arkel–Ketelaar',
+        tagClass: 'tag-polar',
+        title: 'Triángulo de Van Arkel–Ketelaar: un mapa de zonas, no una frontera rígida',
+        intro: 'Este triángulo clasifica enlaces binarios usando dos magnitudes: electronegatividad media de la pareja y diferencia de electronegatividad. La esquina metálica reúne baja electronegatividad y baja diferencia; la esquina covalente favorece valores medios-altos con poca diferencia; la zona iónica crece cuando la diferencia se hace grande.',
+        history: 'Anton Eduard van Arkel introdujo la idea de extremos de enlace en 1941 y J. A. A. Ketelaar amplió y popularizó el enfoque algunos años después. Su valor pedagógico radica en mostrar continuidad: los enlaces no son cajas aisladas, sino familias conectadas por gradientes de comportamiento.',
+        properties: [
+          'Permite ver por qué un criterio único como Δχ = 1.7 no siempre basta.',
+          'Incorpora una segunda variable importante: el promedio de electronegatividad.',
+          'Es especialmente potente para exponer tendencias y zonas intermedias como la covalencia polar.'
+        ],
+        uses: [
+          'Docencia de química general y materiales.',
+          'Comparación rápida de compuestos binarios y discusión conceptual en presentaciones.',
+          'Puente visual entre teoría de enlace, periodicidad y propiedades macroscópicas.'
+        ],
+        safety: [
+          'No debe usarse como criterio experimental de compatibilidad química.',
+          'No reemplaza datos de estructura, termodinámica, cinética ni hojas de seguridad.'
+        ],
+        facts: [
+          'Es un recurso perfecto para explicar que NaCl, Cl2 y Cu representan extremos muy distintos de organización electrónica.',
+          'La gracia del triángulo es que obliga a pensar en “carácter de enlace” y no solo en nombres cerrados.'
+        ],
+        sideTitle: 'Defensa conceptual fuerte',
+        sideList: [
+          'El triángulo comunica continuidad entre lo iónico, lo covalente y lo metálico.',
+          'Sirve para mostrar que algunos compuestos están en zonas híbridas y no en extremos puros.',
+          'En tu exposición puedes decir: “la clasificación es una tendencia dominante, no una identidad absoluta”.'
+        ]
+      }
+    };
+
+    const FACT_BANK = [
+      { title: 'El flúor juega en otra liga', text: 'En la escala de Pauling, el flúor suele tomarse como el referente superior de electronegatividad entre los elementos más comunes. Eso explica por qué tantos enlaces con flúor son tan polarizados.' },
+      { title: 'El oro no es amarillo por capricho', text: 'El color del oro aparece por efectos relativistas en sus electrones. Sí: la teoría de la relatividad mete la cuchara en algo tan cotidiano como una joya.' },
+      { title: 'Diamante y grafito: mismo elemento, destinos opuestos', text: 'Ambos son carbono puro, pero su arquitectura covalente cambia por completo su dureza, conductividad y apariencia.' },
+      { title: 'La polaridad de una molécula no siempre sigue al enlace', text: 'Una molécula puede tener enlaces polares y aun así terminar siendo apolar si la geometría cancela los dipolos, como ocurre con CO2.' },
+      { title: 'Las sales no siempre son “cosas de cocina”', text: 'El término sal en química es muchísimo más amplio que NaCl: incluye una enorme familia de sólidos iónicos con propiedades muy distintas.' },
+      { title: 'El mar de electrones no es una metáfora floja', text: 'En metales, la deslocalización electrónica es justamente lo que permite conducción y deformación sin fractura inmediata.' },
+      { title: 'Un corte numérico no cuenta toda la historia', text: 'Δχ ayuda muchísimo, pero materiales reales pueden mostrar mezcla de caracteres según estructura, presión, estado físico o coordinación.' },
+      { title: 'El agua le debe mucho a su polaridad', text: 'Su punto de ebullición, su papel biológico y su comportamiento como solvente dependen de la combinación entre enlaces polares y puentes de hidrógeno.' },
+      { title: 'N2 es casi un tanque químico', text: 'El triple enlace del nitrógeno molecular es tan fuerte que el gas resulta poco reactivo en condiciones ordinarias.' },
+      { title: 'Las aleaciones cuentan historias de civilización', text: 'Bronce, acero y aluminio aeronáutico demuestran que manipular enlace metálico y estructura cambió la historia tecnológica humana.' },
+      { title: 'Un enlace no vive solo', text: 'El tipo de enlace influye en dureza, solubilidad, conductividad, color, punto de fusión y hasta en la forma en que un material se rompe.' },
+      { title: 'Los gases nobles ya no son tan “inertes” en clase moderna', text: 'Escalas como la de Allen permiten discutirlos con más finura y recordar que algunos sí forman compuestos en condiciones adecuadas.' }
+    ];
+
+    let elements = [];
+    let selected = [];
+    let currentTopic = 'triangle';
+
+    const periodicTable = document.getElementById('periodicTable');
+    const selectedRow = document.getElementById('selectedRow');
+    const resultContent = document.getElementById('resultContent');
+    const scaleSelect = document.getElementById('scaleSelect');
+    const searchInput = document.getElementById('searchInput');
+    const tabRow = document.getElementById('tabRow');
+    const encyclopediaMain = document.getElementById('encyclopediaMain');
+    const encyclopediaSide = document.getElementById('encyclopediaSide');
+    const factGrid = document.getElementById('factGrid');
+    const bondPoint = document.getElementById('bondPoint');
+    const bondGlow = document.getElementById('bondGlow');
+    const bondLabel = document.getElementById('bondLabel');
+    const triangleNote = document.getElementById('triangleNote');
+
+    function normalizeCategory(cat = '') {
+      const c = cat.toLowerCase();
+      if (c.includes('alkali')) return 'alkali';
+      if (c.includes('alkaline')) return 'alkaline';
+      if (c.includes('transition')) return 'transition';
+      if (c.includes('post-transition')) return 'post-transition';
+      if (c.includes('metalloid')) return 'metalloid';
+      if (c.includes('halogen')) return 'halogen';
+      if (c.includes('noble')) return 'noble';
+      if (c.includes('lanthanide')) return 'lanthanide';
+      if (c.includes('actinide')) return 'actinide';
+      if (c.includes('nonmetal')) return 'nonmetal';
+      return 'unknown';
+    }
+
+    function categoryLabel(key) {
+      return {
+        alkali: 'metal alcalino',
+        alkaline: 'metal alcalinotérreo',
+        transition: 'metal de transición',
+        'post-transition': 'metal post-transición',
+        metalloid: 'metaloide',
+        nonmetal: 'no metal',
+        halogen: 'halógeno',
+        noble: 'gas noble',
+        lanthanide: 'lantánido',
+        actinide: 'actínido',
+        unknown: 'categoría no especificada'
+      }[key] || 'categoría no especificada';
+    }
+
+    function isMetal(key) {
+      return ['alkali','alkaline','transition','post-transition','lanthanide','actinide'].includes(key);
+    }
+
+    function esName(el) {
+      return ES_NAMES[el.symbol] || el.name;
+    }
+
+    function normalizeElement(el) {
+      return {
+        number: el.number || el.atomicNumber,
+        symbol: el.symbol,
+        name: el.name,
+        x: el.xpos || el.x,
+        y: (el.category || '').toLowerCase().includes('lanthanide') ? 9 : (el.category || '').toLowerCase().includes('actinide') ? 10 : (el.ypos || el.y),
+        category: el.category || 'unknown',
+        classKey: normalizeCategory(el.category),
+        pauling: typeof el.electronegativity_pauling === 'number' ? el.electronegativity_pauling : (typeof el.pauling === 'number' ? el.pauling : null),
+        allen: typeof ALLEN_VALUES[el.symbol] === 'number' ? ALLEN_VALUES[el.symbol] : null
+      };
+    }
+
+    async function loadElements() {
+      try {
+        const response = await fetch(RAW_JSON_URL);
+        const data = await response.json();
+        elements = data.elements.map(normalizeElement);
+      } catch (error) {
+        elements = FALLBACK_ELEMENTS.map(normalizeElement);
+      }
+      renderTable();
+      renderSelected();
+    }
+
+    function renderTable() {
+      const query = searchInput.value.trim().toLowerCase();
+      periodicTable.innerHTML = '';
+      elements
+        .filter(el => !query || el.symbol.toLowerCase().includes(query) || esName(el).toLowerCase().includes(query) || el.name.toLowerCase().includes(query))
+        .forEach(el => {
+          const div = document.createElement('button');
+          div.className = `element ${el.classKey}`;
+          if (selected.some(s => s.symbol === el.symbol)) div.classList.add('selected');
+          div.style.gridColumn = String(el.x);
+          div.style.gridRow = String(el.y);
+          div.innerHTML = `
+            <div class="num">${el.number}</div>
+            <div class="sym">${el.symbol}</div>
+            <div class="name" title="${esName(el)}">${esName(el)}</div>
+          `;
+          div.addEventListener('click', () => toggleElement(el.symbol));
+          periodicTable.appendChild(div);
+        });
+    }
+
+    function toggleElement(symbol) {
+      const el = elements.find(e => e.symbol === symbol);
+      const idx = selected.findIndex(s => s.symbol === symbol);
+      if (idx >= 0) {
+        selected.splice(idx, 1);
+      } else if (selected.length < 2) {
+        selected.push(el);
+      } else {
+        selected = [selected[1], el];
+      }
+      renderTable();
+      renderSelected();
+      analyzeBond();
+    }
+
+    function clearSelection() {
+      selected = [];
+      renderTable();
+      renderSelected();
+      analyzeBond();
+    }
+
+    function renderSelected() {
+      selectedRow.innerHTML = '';
+      for (let i = 0; i < 2; i++) {
+        const el = selected[i];
+        const card = document.createElement('div');
+        card.className = `selected-card ${el ? '' : 'empty'}`;
+        if (!el) {
+          card.innerHTML = `<div><strong>Slot ${i + 1}</strong><div class="small-muted">Selecciona un elemento de la tabla</div></div>`;
+        } else {
+          card.innerHTML = `
+            <div class="big-sym">${el.symbol}</div>
+            <div><strong>${esName(el)}</strong></div>
+            <div class="meta">
+              Z = ${el.number}<br>
+              Categoría: ${categoryLabel(el.classKey)}<br>
+              χ(Pauling): ${fmt(el.pauling)}<br>
+              χ(Allen): ${fmt(el.allen)}
+            </div>
+          `;
+        }
+        selectedRow.appendChild(card);
+      }
+    }
+
+    function fmt(value) {
+      return typeof value === 'number' ? value.toFixed(2) : 'n/d';
+    }
+
+    function getScaleValue(el, scale) {
+      return scale === 'allen' ? el.allen : el.pauling;
+    }
+
+    function classifyBond(a, b, delta, avg) {
+      const bothMetals = isMetal(a.classKey) && isMetal(b.classKey);
+      const sameElement = a.symbol === b.symbol;
+      if (bothMetals && delta < 0.45 && avg < 2.2) return 'metallic';
+      if (sameElement) return 'covalent';
+      if (delta >= 1.7) return 'ionic';
+      if (delta >= 0.45) return 'polar';
+      if (bothMetals) return 'metallic';
+      return 'covalent';
+    }
+
+    function ionicPercent(delta) {
+      return Math.max(0, Math.min(100, (1 - Math.exp(-0.25 * delta * delta)) * 100));
+    }
+
+    function bondDescriptor(key) {
+      return {
+        ionic: { label: 'Enlace iónico dominante', class: 'tag-ionic', gradient: 'var(--ionic)' },
+        polar: { label: 'Enlace covalente polar', class: 'tag-polar', gradient: 'var(--polar)' },
+        covalent: { label: 'Enlace covalente no polar', class: 'tag-covalent', gradient: 'var(--covalent)' },
+        metallic: { label: 'Enlace metálico', class: 'tag-metallic', gradient: 'var(--metallic)' }
+      }[key];
+    }
+
+    function analyzeBond() {
+      if (selected.length < 2) {
+        resultContent.innerHTML = `
+          <h4 style="margin-top:0;">Diagnóstico de enlace</h4>
+          <p class="explain">Elige dos elementos para desbloquear el análisis. Puedes comenzar con Na + Cl para iónico, H + O para covalente polar o Cu + Cu para metálico.</p>
+        `;
+        resetTriangle();
+        return;
+      }
+
+      const [a, b] = selected;
+      const requestedScale = scaleSelect.value;
+      let usedScale = requestedScale;
+      let x1 = getScaleValue(a, requestedScale);
+      let x2 = getScaleValue(b, requestedScale);
+      let fallback = false;
+
+      if (x1 == null || x2 == null) {
+        if (a.pauling != null && b.pauling != null) {
+          usedScale = 'pauling';
+          x1 = a.pauling;
+          x2 = b.pauling;
+          fallback = requestedScale === 'allen';
+        } else {
+          resultContent.innerHTML = `
+            <h4 style="margin-top:0;">Diagnóstico incompleto</h4>
+            <div class="warning">No hay suficientes datos de electronegatividad para este par en la escala elegida. Prueba con otros elementos o cambia a la escala de Pauling.</div>
+          `;
+          resetTriangle();
+          return;
+        }
+      }
+
+      const delta = Math.abs(x1 - x2);
+      const avg = (x1 + x2) / 2;
+      const ionic = ionicPercent(delta);
+      const bondType = classifyBond(a, b, delta, avg);
+      const style = bondDescriptor(bondType);
+      const topicMap = { ionic: 'ionic', polar: 'polar', covalent: 'covalent', metallic: 'metallic' };
+      currentTopic = topicMap[bondType];
+      renderEncyclopedia();
+      plotTriangle(avg, delta, `${a.symbol}-${b.symbol}`);
+
+      const narrative = {
+        ionic: `La diferencia de electronegatividad es alta y el par se desplaza hacia la región iónica del triángulo. Eso sugiere una distribución muy desigual de la densidad electrónica y un comportamiento dominado por atracción electrostática entre especies con cargas opuestas o fuertemente polarizadas.`,
+        polar: `La diferencia de electronegatividad es intermedia: los electrones se comparten, pero no de manera perfectamente simétrica. El sistema cae en la zona covalente polar, donde aparecen dipolos, mayor interacción intermolecular y propiedades de solubilidad muy sensibles.`,
+        covalent: `La diferencia de electronegatividad es pequeña y ninguno de los átomos domina claramente la nube electrónica. Eso favorece un enlace covalente poco polar o prácticamente no polar, más asociado a electrones compartidos con reparto equilibrado.`,
+        metallic: `Ambos participantes tienen carácter metálico y la diferencia de electronegatividad es baja. La lectura dominante es enlace metálico, donde los electrones de valencia tienden a deslocalizarse a lo largo de la red, facilitando conductividad, brillo y deformación plástica.`
+      };
+
+      resultContent.innerHTML = `
+        <div class="result-tag ${style.class}">${style.label}</div>
+        <h4 style="margin:0 0 8px;">${esName(a)} + ${esName(b)}</h4>
+        <p class="explain">${narrative[bondType]}</p>
+        <div class="result-grid">
+          <div class="metric"><strong>${delta.toFixed(2)}</strong><span>Δχ (${usedScale === 'allen' ? 'Allen' : 'Pauling'})</span></div>
+          <div class="metric"><strong>${avg.toFixed(2)}</strong><span>χ̄ media</span></div>
+          <div class="metric"><strong>${ionic.toFixed(1)}%</strong><span>carácter iónico estimado</span></div>
+        </div>
+        <div class="bond-visual">
+          <div class="bond-stage">
+            <div class="atom atom-a">${a.symbol}</div>
+            <div class="bond-core">
+              <div class="bond-line" style="background:${style.gradient};"></div>
+              <div class="electron-cloud">
+                <span class="electron"></span>
+                <span class="electron"></span>
+                <span class="electron"></span>
+                <span class="electron"></span>
+              </div>
+            </div>
+            <div class="atom atom-b">${b.symbol}</div>
+          </div>
+        </div>
+        ${fallback ? '<div class="warning">La escala Allen no estaba disponible para uno o ambos elementos. Se usó Pauling como respaldo para no interrumpir el análisis.</div>' : ''}
+        <div class="warning">Consejo de exposición: menciona que el corte numérico es aproximado y que el triángulo permite una interpretación más rica que un solo umbral.</div>
+      `;
+    }
+
+    function plotTriangle(avg, delta, label) {
+      const xMin = 0.7, xMax = 4.0;
+      const yMin = 0.0, yMax = 4.0;
+      const px = 100 + ((avg - xMin) / (xMax - xMin)) * (600 - 100);
+      const py = 360 - ((delta - yMin) / (yMax - yMin)) * (360 - 40);
+      bondPoint.setAttribute('cx', px.toFixed(1));
+      bondPoint.setAttribute('cy', py.toFixed(1));
+      bondPoint.setAttribute('opacity', '1');
+      bondGlow.setAttribute('cx', px.toFixed(1));
+      bondGlow.setAttribute('cy', py.toFixed(1));
+      bondGlow.setAttribute('opacity', '1');
+      bondLabel.setAttribute('x', (px + 14).toFixed(1));
+      bondLabel.setAttribute('y', (py - 10).toFixed(1));
+      bondLabel.textContent = label;
+      bondLabel.setAttribute('opacity', '1');
+      triangleNote.textContent = `Ubicación actual de ${label}: χ̄ = ${avg.toFixed(2)} y Δχ = ${delta.toFixed(2)}. Úsalo para argumentar por qué el par se acerca más a una región que a otra.`;
+    }
+
+    function resetTriangle() {
+      bondPoint.setAttribute('opacity', '0');
+      bondGlow.setAttribute('opacity', '0');
+      bondLabel.setAttribute('opacity', '0');
+      triangleNote.textContent = 'La posición final se vuelve visible cuando el sistema tiene dos elementos seleccionados. Recuerda: el triángulo es una guía de tendencia, no un veredicto absoluto para todos los materiales complejos.';
+    }
+
+    function renderTabs() {
+      tabRow.innerHTML = '';
+      const tabs = ['triangle', 'ionic', 'polar', 'covalent', 'metallic'];
+      tabs.forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = `ghost-btn tab-btn ${key === currentTopic ? 'active' : ''}`;
+        btn.textContent = ENCYCLOPEDIA[key].label;
+        btn.addEventListener('click', () => {
+          currentTopic = key;
+          renderEncyclopedia();
+        });
+        tabRow.appendChild(btn);
+      });
+    }
+
+    function renderEncyclopedia() {
+      renderTabs();
+      const item = ENCYCLOPEDIA[currentTopic];
+      encyclopediaMain.innerHTML = `
+        <div class="result-tag ${item.tagClass}">${item.label}</div>
+        <h4>${item.title}</h4>
+        <p class="long-copy">${item.intro}</p>
+        <div data-topic="history">
+          <h5>Historia y desarrollo conceptual</h5>
+          <p class="long-copy">${item.history}</p>
+        </div>
+        <div>
+          <h5>Propiedades y comportamiento físico</h5>
+          <ul>${item.properties.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div data-topic="uses">
+          <h5>Aplicaciones y presencia en la vida real</h5>
+          <ul>${item.uses.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div data-topic="safety">
+          <h5>Compatibilidad y seguridad básica</h5>
+          <ul>${item.safety.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div data-topic="facts" class="callout extra-panel">
+          <strong>Curiosidades útiles:</strong>
+          <ul>${item.facts.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+      `;
+      encyclopediaSide.innerHTML = `
+        <h4 style="margin-top:0;">${item.sideTitle}</h4>
+        <ul>${item.sideList.map(x => `<li>${x}</li>`).join('')}</ul>
+        <div class="callout" style="margin-top:18px;">
+          <strong>Tip de defensa:</strong> cuando te pregunten si un enlace es “totalmente” de un tipo, responde que los modelos más serios hablan de carácter dominante. Esa frase suena técnica y además es químicamente más correcta.
+        </div>
+      `;
+      applyTopicVisibility();
+    }
+
+    function renderFacts() {
+      const shuffled = [...FACT_BANK].sort(() => Math.random() - 0.5).slice(0, 8);
+      factGrid.innerHTML = shuffled.map(f => `
+        <article class="fact" data-topic="facts">
+          <h5>${f.title}</h5>
+          <p>${f.text}</p>
+        </article>
+      `).join('');
+    }
+
+    function applyTopicVisibility() {
+      document.body.classList.toggle('hide-facts', !document.getElementById('toggleFacts').checked);
+      document.body.classList.toggle('hide-history', !document.getElementById('toggleHistory').checked);
+      document.body.classList.toggle('hide-uses', !document.getElementById('toggleUses').checked);
+      document.body.classList.toggle('hide-safety', !document.getElementById('toggleSafety').checked);
+    }
+
+    function useExample(a, b) {
+      const ea = elements.find(el => el.symbol === a);
+      const eb = elements.find(el => el.symbol === b);
+      if (!ea || !eb) return;
+      selected = [ea, eb];
+      renderTable();
+      renderSelected();
+      analyzeBond();
+      document.getElementById('explorador').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function setDensity(mode) {
+      document.body.dataset.density = mode;
+      document.getElementById('densityToggle').textContent = mode === 'full' ? 'Cambiar a modo resumido' : 'Cambiar a modo completo';
+    }
+
+    function initHeroCanvas() {
+      const canvas = document.getElementById('heroCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let w = 0, h = 0;
+
+      function resize() {
+        w = canvas.width = canvas.offsetWidth * devicePixelRatio;
+        h = canvas.height = canvas.offsetHeight * devicePixelRatio;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+        particles = Array.from({ length: Math.min(85, Math.floor(window.innerWidth / 18)) }, () => ({
+          x: Math.random() * canvas.offsetWidth,
+          y: Math.random() * canvas.offsetHeight,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          r: Math.random() * 2.2 + 0.6
+        }));
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.offsetWidth) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.offsetHeight) p.vy *= -1;
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(193, 219, 255, 0.75)';
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 110) {
+              ctx.strokeStyle = `rgba(109, 124, 255, ${0.16 - dist / 900})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      draw();
+      window.addEventListener('resize', resize);
+    }
+
+    document.getElementById('toggleFacts').addEventListener('change', applyTopicVisibility);
+    document.getElementById('toggleHistory').addEventListener('change', applyTopicVisibility);
+    document.getElementById('toggleUses').addEventListener('change', applyTopicVisibility);
+    document.getElementById('toggleSafety').addEventListener('change', applyTopicVisibility);
+
+    document.getElementById('shuffleFactsBtn').addEventListener('click', renderFacts);
+    document.getElementById('densityToggle').addEventListener('click', () => setDensity(document.body.dataset.density === 'full' ? 'compact' : 'full'));
+    document.getElementById('fullModeBtn').addEventListener('click', () => setDensity('full'));
+    document.getElementById('compactModeBtn').addEventListener('click', () => setDensity('compact'));
+    document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
+
+    searchInput.addEventListener('input', renderTable);
+    scaleSelect.addEventListener('change', analyzeBond);
+
+    document.querySelectorAll('.example-btn').forEach(btn => {
+      btn.addEventListener('click', () => useExample(btn.dataset.a, btn.dataset.b));
+    });
+
+    renderEncyclopedia();
+    renderFacts();
+    applyTopicVisibility();
+    initHeroCanvas();
+    loadElements();
+  </script>
+</body>
+</html>
